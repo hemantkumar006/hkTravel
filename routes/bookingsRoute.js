@@ -2,10 +2,35 @@ const express = require("express");
 const router = express.Router();
 const Booking = require("../models/bookingModel");
 const Car = require("../models/carModel");
+const { v4: uuidv4 } = require("uuid");
+const stripe = require("stripe")(
+    "sk_test_51KfQlkSBgTuKKwW6AR0QNQzTbLVCHHonIamOXYMGt0ljnsXjqpjXps52fGayXkAxX286tlhrGT0fWYMnk0ER4OSO00SoKHmWKY");
 router.post("/bookcar", async (req, res) => {
 
     req.body.transactionId='1234'
+    const { token } = req.body;
     try{
+
+
+        const customer = await stripe.customers.create({
+            email: token.email,
+            source: token.id,
+          });
+
+          const payment = await stripe.charges.create(
+            {
+              amount: req.body.totalAmount * 100,
+              currency: "inr",
+              customer: customer.id,
+              receipt_email: token.email
+            },
+            {
+              idempotencyKey: uuidv4(),
+              
+            }
+          );
+
+
         const newbooking = new Booking(req.body);
         await newbooking.save();
         const car = await Car.findOne({ _id: req.body.car });
