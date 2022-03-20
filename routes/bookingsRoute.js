@@ -7,7 +7,7 @@ const stripe = require("stripe")(
     "sk_test_51KfQlkSBgTuKKwW6AR0QNQzTbLVCHHonIamOXYMGt0ljnsXjqpjXps52fGayXkAxX286tlhrGT0fWYMnk0ER4OSO00SoKHmWKY");
 router.post("/bookcar", async (req, res) => {
 
-    req.body.transactionId='1234'
+    
     const { token } = req.body;
     try{
 
@@ -48,25 +48,5 @@ router.post("/bookcar", async (req, res) => {
           return res.status(400).json(error);
         }
       });
-      
-
-        const newbooking = new Booking(req.body);
-        await newbooking.save();
-        const car = await Car.findOne({ _id: req.body.car });
-        console.log(req.body.car);
-        car.bookedTimeSlots.push(req.body.bookedTimeSlots);
-  
-        await car.save();
-        res.send("Your booking is successfull");
-    }
-
-    catch (error) {
-        console.log(error);
-        return res.status(400).json(error);
-        
-      }
-
-
-});
 
 module.exports = router;
